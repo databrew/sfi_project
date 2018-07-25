@@ -1,0 +1,17 @@
+.table{
+  width:auto;
+  font-size: 12px;
+  font-family: "Computer Modern Bright";
+}
+
+.verysmall .table{
+  font-size: 7px;
+}
+
+.medium .table{
+  font-size: 10px;
+}
+
+.large .table{
+  font-size: 18px;
+}

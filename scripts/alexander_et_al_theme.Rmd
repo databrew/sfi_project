@@ -1,0 +1,96 @@
+---
+title: "Alexander_et_al"
+author: "Ben Brew"
+date: "July 25, 2018"
+output: html_document
+css: markdown_theme.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+```
+
+## This script will read in data from research by Alexandar et al and create graphics with a unique theme
+
+
+```{r cars, warning=FALSE}
+# initialize libraries 
+library(databrew)
+library(flextable)
+library(readr)
+library(xlsx)
+library(knitr)
+library(kableExtra)
+library(xtable)
+library(DT)
+library(lemon)
+
+knit_print.data.frame <- lemon_print
+
+# source functions script for custom functions
+source('functions.R')
+
+# create an object to store the path to the data
+data_folder <- '../data/Alexander_et_al'
+
+
+
+```
+
+<!-- <div class="large"> -->
+
+## Figure 1 
+Because figure 1 has 32 rows, I recommend shortening the amount visible. In the same vein, the column "docket_text" is also quite long, so I discarded everything after the 40th character and added an ellipsis at the end of each row. 
+```{r, fig.keep='all', fig.width=7, fig.height=7}
+
+# ----------------------------------- FIGURE 
+# read in figure 1 data set
+figure_1 <- read_csv(paste0(data_folder, '/figure_1.csv'))
+
+# subset data by selecting all the rows in which are not NA in column 'case_number'
+figure_1 <- figure_1[!is.na(figure_1$case_number),]
+
+# figure 1 in the paper has 3 more columns than what is available in the data
+# shorten the last column and add '...' to not blow up the table
+figure_1$docket_text <- paste0(substr(figure_1$docket_text, 1, 40), '...')
+
+# create a dummy row for the table 
+dummy_row <- c('...', '...', '...', '...')
+last_row <- figure_1[nrow(figure_1),]
+
+# combine with a subsetted version of figure 1 for the table appearance
+figure_1_sub <- figure_1[1:10, ]
+figure_1_table <- rbind(figure_1_sub, 
+                        dummy_row,
+                        last_row)
+
+# generate a latex table as suggested in the paper using kable
+kable(figure_1_table) %>% 
+  kable_styling(bootstrap_options = c("condensed", 'striped'),
+                full_width = FALSE)
+
+```
+
+
+## Figure 6
+```{r, fig.keep='all', fig.width=7, fig.height=7}
+
+# read in figure 6 data set 
+figure_6 <- read.xlsx(paste0(data_folder, '/figure_6.xlsx'), sheetName = 1)
+
+
+
+```
+
+
+## Figures 4 and 7
+```{r, fig.keep='all', fig.width=7, fig.height=7}
+
+# read in figure 4 through 7 data set
+figure_4_7 <- read.xlsx(paste0(data_folder, '/figure_4_7.xlsx'), sheetName = 1)
+
+
+```
+
