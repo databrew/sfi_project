@@ -15,7 +15,7 @@ options(xtable.timestamp = "")
 ## This script will read in data from research by Alexandar et al and create graphics with a unique theme
 
 
-```{r cars, warning=FALSE}
+```{r cars, warning=FALSE, echo = FALSE}
 # initialize libraries 
 library(databrew)
 library(flextable)
@@ -23,11 +23,7 @@ library(readr)
 library(xlsx)
 library(knitr)
 library(kableExtra)
-library(xtable)
-library(DT)
-library(lemon)
-
-knit_print.data.frame <- lemon_print
+library(plotly)
 
 # source functions script for custom functions
 source('functions.R')
@@ -35,17 +31,14 @@ source('functions.R')
 # create an object to store the path to the data
 data_folder <- '../data/Alexander_et_al'
 
-
-
 ```
 
 <!-- <div class="large"> -->
 
 ## Figure 1 
 Because figure 1 has 32 rows, I recommend shortening the amount visible. In the same vein, the column "docket_text" is also quite long, so I discarded everything after the 40th character and added an ellipsis at the end of each row. 
-```{r, fig.keep='all', fig.width=7, fig.height=7}
+```{r}
 
-# ----------------------------------- FIGURE 
 # read in figure 1 data set
 figure_1 <- read_csv(paste0(data_folder, '/figure_1.csv'))
 
@@ -67,30 +60,144 @@ figure_1_table <- rbind(figure_1_sub,
                         last_row)
 
 # generate a latex table as suggested in the paper using kable
-kable(figure_1_table) %>% 
+kable(figure_1_table, caption = 'Figure 1') %>% 
   kable_styling(bootstrap_options = c("condensed", 'striped'),
-                full_width = FALSE)
+                full_width = TRUE)
 
 ```
 
 
-## Figure 6
-```{r, fig.keep='all', fig.width=7, fig.height=7}
+## Figure 6 
+
+```{r, fig.width=7, fig.height=7}
 
 # read in figure 6 data set 
 figure_6 <- read.xlsx(paste0(data_folder, '/figure_6.xlsx'), sheetName = 1)
 
+# remove * from pair_order_text and docket_text to mimic the text in the paper 
+figure_6$paired_order_text <- gsub('*', '', figure_6$paired_order_text, fixed = TRUE)
+figure_6$docket_text <- gsub('*', '', figure_6$docket_text, fixed = TRUE)
+
+
+# generate a latex table 
+kable(figure_6, caption = 'Figure 6') %>% 
+  kable_styling(bootstrap_options = c("condensed", 'striped'),
+                full_width = TRUE)
 
 
 ```
 
 
-## Figures 4 and 7
-```{r, fig.keep='all', fig.width=7, fig.height=7}
+## Figures 4
+```{r, fig.keep='all', fig.width=6, fig.height=7}
 
-# read in figure 4 through 7 data set
+# read in figure 4 and 7 data set
 figure_4_7 <- read.xlsx(paste0(data_folder, '/figure_4_7.xlsx'), sheetName = 1)
 
+# split data up into figure_4 and figure_7
+figure_4 <- figure_4_7[,1:2]
+rm(figure_4_7)
+
+# recode names of columns
+names(figure_4) <- c('variable', 'percentage')
+
+# convert percents to percentage form round 
+figure_4$percentage <- round((figure_4$percentage*100))
+
+# create two separate data sets for figure_4 for the two pie charts in the paper
+figure_4_1 <- figure_4[grepl('Exemption|Color|Race|National|Religion|Sex|Retaliation', figure_4$variable),]
+figure_4_2 <- figure_4[grepl('Indian|Middle|Hispanic|Asian|African|Native', figure_4$variable),]
+rm(figure_4)
+
+# # reorder factors 
+# figure_4_1$variable <- factor(figure_4_1$variable, levels = c('Retaliation', 'Exemption', 'Color', 'Race', 'National origin', 'Religion', 'Sex'))
+# figure_4_1$variable <- as.character(figure_4_1$variable)
+
+# get font object for plot
+f <- list(
+     size = 13,
+     color = "#A9A9A9"
+    )
+
+title_f <- list(
+     size = 16,
+     color = "black"
+    )
+
+
+# get a gray scale color vector for the pie chart
+colors <- gray.colors(length(unique(figure_4_1$variable)))
+
+# use plotly's R pakage to create tow side by side pie charts
+plot_ly(figure_4_1 ,labels = ~variable, values = ~percentage,
+                            type ='pie',
+                            hole = 0,
+                            text= ~variable,
+                            textposition = 'outside',
+                            outsidetextfont = f,
+        height = 800, width = 1200,
+        domain = list(x = c(0, 0.4), y = c(0, 1)),
+        marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 0.5)))  %>%
+  add_pie(data = figure_4_2, labels = ~variable, values = ~percentage,
+          domain = list(x = c(0.6, 1), y = c(0, 1))) %>%
+      
+      config(displayModeBar = F) %>%
+      
+      layout(title ='' , font = title_f,showlegend = F,
+             annotations = list(
+               showarrow = FALSE,
+               text = ''), 
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE), 
+             margin = list(l = 50, r = 50, b = 50, t = 50))
+
+    
+
+```
+
+## Figures 7
+```{r, fig.keep='all', fig.width=7, fig.height=7}
+
+# read in figure 4 and 7 data set
+figure_4_7 <- read.xlsx(paste0(data_folder, '/figure_4_7.xlsx'), sheetName = 1)
+
+# split data up into figure_7
+figure_7 <- figure_4_7[,3:4]
+rm(figure_4_7)
+
+# recode names of columns
+names(figure_7) <- c('variable', 'percentage')
+
+# convert percents to percentage form and round 
+figure_7$percentage <- round((figure_7$percentage*100))
+
+# remove NAs
+figure_7 <- figure_7[complete.cases(figure_7),]
+
+# get a gray scale color vector 
+colors <- gray.colors(length(unique(figure_7$variable)))
+
+# plot
+plot_ly(figure_7 ,labels = ~variable, values = ~percentage,
+                            type ='pie',
+                            hole = 0,
+                            text= ~variable,
+                            textposition = 'outside',
+                            outsidetextfont = f,
+        domain = list(x = c(0, 1), y = c(0, 0.8)),
+        marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 0.5)))  %>%
+      config(displayModeBar = F) %>%
+      
+      layout(title ='' , font = title_f, showlegend = F,
+             annotations = list(
+               showarrow = FALSE,
+               text = ''), 
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+    
 
 ```
 
