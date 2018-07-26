@@ -25,8 +25,11 @@ library(knitr)
 library(kableExtra)
 library(plotly)
 
-# source functions script for custom functions
+# source functions script for custom functions and sfi themes
 source('functions.R')
+source('sfi_theme.R')
+source('sfi_theme_stata.R')
+
 
 # create an object to store the path to the data
 data_folder <- '../data/Feldman'
@@ -56,21 +59,33 @@ figure_1$colors <- ifelse(figure_1$federal_state == '0', "#D7D6D6", "#545454")
 
 # recode federal state levels for graph
 figure_1$federal_state <- ifelse(figure_1$federal_state == '1', 'Federal', 'State')
-#
-# there are two columns, (1) federal, a dummy variable indicating whether its "state" or "federal" govt and (2) clarity index which is a vector of clarity scores
-# need to make an overlapping density plotwith ggplot and custom theme
+
+```
+
+## Figure 1 with SFI R theme
+```{r}
+# using R theme
 ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
   geom_histogram(aes(y=..density..), bins = 75, alpha = 0.3, color = 'black') +
   labs(x = 'Clarity score', y = 'Density', title = 'Figure 1') +
     scale_fill_manual(name = '' ,
                       values = c("#ffffff", "#545454")) + theme_sfi()
 
-# use ggthemes
 
 ```
 
 
-## Figure 1 
+## Figure 1 with SFI stata theme
+```{r}
+# using R theme
+ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
+  geom_histogram(aes(y=..density..), bins = 75, alpha = 0.3, color = 'black') +
+  labs(x = 'Clarity score', y = 'Density', title = 'Figure 1') +
+    scale_fill_manual(name = '' ,
+                      values = c("#ffffff", "#545454")) + theme_sfi_stata()
+
+
+```
 
 ```{r}
 
