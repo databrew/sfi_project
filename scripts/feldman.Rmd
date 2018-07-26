@@ -1,0 +1,83 @@
+---
+title: "Alexander_et_al"
+author: "Ben Brew"
+date: "July 25, 2018"
+output: html_document
+css: markdown_theme.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+```
+
+## This script will read in data from research by Alexandar et al and create graphics with a unique theme
+
+
+```{r cars, warning=FALSE, echo = FALSE}
+# initialize libraries 
+library(databrew)
+library(flextable)
+library(readr)
+library(xlsx)
+library(knitr)
+library(kableExtra)
+library(plotly)
+
+# source functions script for custom functions
+source('functions.R')
+
+# create an object to store the path to the data
+data_folder <- '../data/Feldman'
+
+```
+
+<!-- <div class="large"> -->
+
+## Figure 1 
+
+Please not that the data given to us is slightly different than the data in the paper. For examle, the paper cites that there are 4,046 observations, but the data
+from box only has 3,856. The minimum and maximum of the clarity scores reported in the paper are also slightly different than the data we have. The distribution of the 
+clarity scores, and thus the plot, are very similar though.
+```{r}
+
+# read in data from Feldman folder
+figure_1 <- read_csv(paste0(data_folder, '/Fig1Data_AF.csv'))
+
+# rename columns for ease of coding
+names(figure_1) <- c('federal_state', 'clarity_score')
+
+# restructure data types for plotting
+figure_1$federal_state <- as.character(figure_1$federal_state)
+
+# add a color vector to the data frame
+figure_1$colors <- ifelse(figure_1$federal_state == '0', "#D7D6D6", "#545454")
+
+# recode federal state levels for graph
+figure_1$federal_state <- ifelse(figure_1$federal_state == '1', 'Federal', 'State')
+#
+# there are two columns, (1) federal, a dummy variable indicating whether its "state" or "federal" govt and (2) clarity index which is a vector of clarity scores
+# need to make an overlapping density plotwith ggplot and custom theme
+ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
+  geom_histogram(aes(y=..density..), bins = 75, alpha = 0.3, color = 'black') +
+  labs(x = 'Clarity score', y = 'Density', title = 'Figure 1') +
+    scale_fill_manual(name = '' ,
+                      values = c("#ffffff", "#545454")) + theme_sfi()
+
+# use ggthemes
+
+```
+
+
+## Figure 1 
+
+```{r}
+
+# read in data from Feldman folder
+figure_2 <- read_csv(paste0(data_folder, '/Fig2Data_AF.csv'))
+
+# there are two columns, (1) federal, a dummy variable indicating whether its "state" or "federal" govt and (2) words, which is just a vector of numbers
+# need to make an overlapping kernal density with ggplot and custom theme
+
+```
