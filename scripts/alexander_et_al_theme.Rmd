@@ -88,7 +88,7 @@ kable(figure_6, caption = 'Figure 6') %>%
 ```
 
 
-## Figures 4
+## Figure 4
 ```{r, fig.keep='all', fig.width=6, fig.height=7}
 
 # read in figure 4 and 7 data set
@@ -128,6 +128,7 @@ title_f <- list(
 # get a gray scale color vector for the pie chart
 colors <- gray.colors(length(unique(figure_4_1$variable)))
 
+
 # use plotly's R pakage to create tow side by side pie charts
 plot_ly(figure_4_1 ,labels = ~variable, values = ~percentage,
                             type ='pie',
@@ -136,25 +137,25 @@ plot_ly(figure_4_1 ,labels = ~variable, values = ~percentage,
                             textposition = 'outside',
                             outsidetextfont = f,
         height = 800, width = 1200,
-        domain = list(x = c(0, 0.4), y = c(0, 1)),
+        domain = list(x = c(0, 0.3), y = c(0, 1)),
         marker = list(colors = colors,
                       line = list(color = '#FFFFFF', width = 0.5)))  %>%
   add_pie(data = figure_4_2, labels = ~variable, values = ~percentage,
-          domain = list(x = c(0.6, 1), y = c(0, 1))) %>%
+          domain = list(x = c(0.5, 0.8), y = c(0, 1))) %>%
       
       config(displayModeBar = F) %>%
       
-      layout(title ='' , font = title_f,showlegend = F,
+      layout(title = '' , font = title_f, showlegend = F,
              annotations = list(
                showarrow = FALSE,
                text = ''), 
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE), 
-             margin = list(l = 50, r = 50, b = 50, t = 50))
+             margin = list(l = 50, r = 50, b = 50, t = 50)) 
 
-    
 
 ```
+
 
 ## Figures 7
 ```{r, fig.keep='all', fig.width=7, fig.height=7}
