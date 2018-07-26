@@ -7,15 +7,6 @@ css: markdown_theme.css
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-options(xtable.floating = FALSE)
-options(xtable.timestamp = "")
-```
-
-## This script will read in data from research by Alexandar et al and create graphics with a unique theme
-
-
-```{r cars, warning=FALSE, echo = FALSE}
 # initialize libraries 
 library(databrew)
 library(flextable)
@@ -25,14 +16,22 @@ library(knitr)
 library(kableExtra)
 library(plotly)
 
+knitr::opts_chunk$set(echo = TRUE)
+options(xtable.floating = FALSE)
+options(xtable.timestamp = "")
+```
+
+## This script will read in data from research by Alexandar et al and create graphics with a unique theme
+
+
+```{r cars, warning=FALSE, echo=T, results='hide'}
 # source functions script for custom functions and sfi themes
 source('functions.R')
 source('sfi_theme.R')
 source('sfi_theme_stata.R')
 
-
-# create an object to store the path to the data
-data_folder <- '../data/Feldman'
+# suppress scientific notation in plots
+options(scipen=999)
 
 ```
 
@@ -43,7 +42,10 @@ data_folder <- '../data/Feldman'
 Please not that the data given to us is slightly different than the data in the paper. For examle, the paper cites that there are 4,046 observations, but the data
 from box only has 3,856. The minimum and maximum of the clarity scores reported in the paper are also slightly different than the data we have. The distribution of the 
 clarity scores, and thus the plot, are very similar though.
-```{r}
+```{r echo=T, results='hide'}
+
+# create an object to store the path to the data
+data_folder <- '../data/Feldman'
 
 # read in data from Feldman folder
 figure_1 <- read_csv(paste0(data_folder, '/Fig1Data_AF.csv'))
@@ -63,7 +65,7 @@ figure_1$federal_state <- ifelse(figure_1$federal_state == '1', 'Federal', 'Stat
 ```
 
 ## Figure 1 with SFI R theme
-```{r}
+```{r echo=T, results='hide'}
 # using R theme
 ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
   geom_histogram(aes(y=..density..), bins = 75, alpha = 0.3, color = 'black') +
@@ -76,7 +78,7 @@ ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
 
 
 ## Figure 1 with SFI stata theme
-```{r}
+```{r echo=T, results='hide'}
 # using R theme
 ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
   geom_histogram(aes(y=..density..), bins = 75, alpha = 0.3, color = 'black') +
@@ -87,12 +89,72 @@ ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
 
 ```
 
-```{r}
+
+## Another version of Figure 1 using R theme (adjusting arguments in the theme function)
+```{r echo=T, results='hide'}
+# using R theme
+ggplot(figure_1, aes(x = clarity_score, fill = federal_state))  +
+  geom_histogram(aes(y=..density..), bins = 75, alpha = 0.3) +
+  labs(x = 'Clarity score', y = 'Density', title = 'Figure 1') +
+    scale_fill_manual(name = '' ,
+                      values = c("black", "#545454")) + theme_sfi(gm = TRUE, gc = 'gray', gl = 'solid')
+
+
+```
+
+
+# Figure 2 Kernel density plot.
+
+```{r echo=T, results='hide'}
 
 # read in data from Feldman folder
 figure_2 <- read_csv(paste0(data_folder, '/Fig2Data_AF.csv'))
 
-# there are two columns, (1) federal, a dummy variable indicating whether its "state" or "federal" govt and (2) words, which is just a vector of numbers
-# need to make an overlapping kernal density with ggplot and custom theme
+# rename columns for ease of coding
+names(figure_2) <- c('federal_state', 'words')
+
+# restructure data types for plotting
+figure_2$federal_state <- as.character(figure_2$federal_state)
+
+# add a color vector to the data frame
+figure_2$colors <- ifelse(figure_2$federal_state == '0', "#D7D6D6", "#545454")
+
+# recode federal state levels for graph
+figure_2$federal_state <- as.factor(ifelse(figure_2$federal_state == '1', 'Federal', 'State'))
+
+# # subset figure_2 by removing all rows where words is over 20k (to mimic plot in the paper)
+# figure_2 <- figure_2 %>% dplyr::filter(words <= 20000)
+
+```
+
+
+Figure 2 group by line type
+```{r echo=T, results='hide'}
+# estimate kernel density using word column and grouping by line type
+ggplot(figure_2, aes(x = words)) +
+  stat_density(aes(group = federal_state, linetype = federal_state),
+               position="identity",
+               geom="line", kernel = "gaussian", size = 0.5) +
+  xlim(c(0, 20000)) + 
+   scale_fill_manual(name = '' ,
+                     values = c("black", "#545454")) +
+  labs(x = 'Words', y = 'Kernel Density') +
+  theme_sfi()
+
+```
+
+
+Figure 2 group by color
+```{r}
+# estimate kernel density using word column and grouping by color
+ggplot(figure_2, aes(x = words)) +
+  stat_density(aes(group = federal_state, color = federal_state),
+               position="identity",
+               geom="line", kernel = "gaussian", size = 1, alpha = 0.7) +
+  xlim(c(0, 20000)) + 
+   scale_color_manual(name = '' ,
+                     values = c("black", "#D3D3D3")) +
+  labs(x = 'Words', y = 'Kernel Density') +
+  theme_sfi()
 
 ```
