@@ -138,7 +138,7 @@ ggplot(figure_2, aes(x = words)) +
   xlim(c(0, 20000)) + 
    scale_fill_manual(name = '' ,
                      values = c("black", "#545454")) +
-  labs(x = 'Words', y = 'Kernel Density') +
+  labs(title = 'Figure 2', x = 'Words', y = 'Kernel Density') +
   theme_sfi()
 
 ```
@@ -154,7 +154,7 @@ ggplot(figure_2, aes(x = words)) +
   xlim(c(0, 20000)) + 
    scale_color_manual(name = '' ,
                      values = c("black", "#D3D3D3")) +
-  labs(x = 'Words', y = 'Kernel Density') +
+  labs(title = 'Figure 2', x = 'Words', y = 'Kernel Density') +
   theme_sfi()
 
 ```
