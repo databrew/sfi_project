@@ -29,7 +29,7 @@ library(plotly)
 source('functions.R')
 
 # create an object to store the path to the data
-data_folder <- '../data/Alexander_et_al'
+data_folder <- '../Databrew Graphics/Alexander et al'
 
 ```
 

@@ -9,7 +9,7 @@
 *.xlsx
 
 # dont push anything inside the data folder
-data/*
+Databrew Graphics/*
 
 # Example code in package build process
 *-Ex.R
